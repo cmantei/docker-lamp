@@ -27,7 +27,7 @@ function filtrar_campos($campo) {
 }
 
 function validacion_campos($campo) {
-    if ($campo !== "" && strlen($campo) >= 3) {
+    if (!empty($campo) && strlen($campo) >= 3 && strlen($campo) <= 30) {
         return true;
     } else {
         return false;
