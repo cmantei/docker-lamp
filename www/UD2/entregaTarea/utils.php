@@ -27,8 +27,7 @@ function filtrar_campos($campo) {
 }
 
 function validacion_campos($campo) {
-    $campo_validado = filtrar_campos($campo);
-    if ($campo_validado !== "") {
+    if ($campo !== "" && strlen($campo) >= 3) {
         return true;
     } else {
         return false;
@@ -36,9 +35,14 @@ function validacion_campos($campo) {
 }
 
 function guardar_tareas($id, $descripcion, $estado){
-    if(validacion_campos($id) && validacion_campos($descripcion) && validacion_campos($estado)){
+
+    $id_filtrado = filtrar_campos($id);
+    $descripcion_filtrado = filtrar_campos($descripcion);
+    $estado_filtrado = filtrar_campos($estado);
+    
+    if(validacion_campos($id_filtrado) && validacion_campos($descripcion_filtrado) && validacion_campos($estado_filtrado)){
         global $tareas;
-        $tarea = ["id" => $id, "descripcion" => $descripcion, "estado" => $estado];
+        $tarea = ["id" => $id_filtrado, "descripcion" => $descripcion_filtrado, "estado" => $estado_filtrado];
         $tareas[] = $tarea;
         return true;
     } else {

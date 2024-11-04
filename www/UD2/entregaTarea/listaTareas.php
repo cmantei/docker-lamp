@@ -18,7 +18,6 @@
                     <h2>Lista de Tareas</h2>
                 </div>
                 <div class="container">
-                    <p>Aquí va el contenido </p>
                     <div class="table">
     <table class="table table-striped table-hover">
         <thead class="thead">

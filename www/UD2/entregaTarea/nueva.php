@@ -25,12 +25,21 @@
                     $descripcion = $_POST['descripcion'];
                     $estado = $_POST['estado'];
                     
+                    var_dump(filtrar_campos($id));
+                    var_dump(filtrar_campos($descripcion));
+                    var_dump(filtrar_campos($estado));
+                    var_dump(validacion_campos($id));
+                    var_dump(validacion_campos($descripcion));
+                    
+
                     if (guardar_tareas($id, $descripcion, $estado)) {
                         echo "<p>Los datos se guardaron correctamente</p>";
                     } else {
-                        echo "<p>Hubo un error a la hora de guardar los datos</p>";
+                        echo "<p>Hubo un error al guardar los datos</p>";
                     }
-                    
+
+                    var_dump($tareas);
+
                     ?>
                     <!--Tabla para comprobar que se guardan los campos del formulario en el array-->
                     <table class="table table-striped table-hover">
