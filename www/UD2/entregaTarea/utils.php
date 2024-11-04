@@ -19,4 +19,30 @@ function devolver_lista_tareas($tareas) {
     }
 }
 
+function filtrar_campos($campo) {
+    $campo = trim($campo);
+    $campo = stripslashes($campo);
+    $campo = htmlspecialchars($campo);
+    return $campo;
+}
+
+function validacion_campos($campo) {
+    $campo_validado = filtrar_campos($campo);
+    if ($campo_validado !== "") {
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function guardar_tareas($id, $descripcion, $estado){
+    if(validacion_campos($id) && validacion_campos($descripcion) && validacion_campos($estado)){
+        global $tareas;
+        $tarea = ["id" => $id, "descripcion" => $descripcion, "estado" => $estado];
+        $tareas[] = $tarea;
+        return true;
+    } else {
+        return false;
+    }
+}
 ?>

@@ -18,7 +18,32 @@
                     <h2>Resultado del formulario</h2>
                 </div>
                 <div class="container">
-                    <p>Aquí va el contenido </p>
+                    <?php
+                    include "utils.php";
+                    
+                    $id = $_POST['id'];
+                    $descripcion = $_POST['descripcion'];
+                    $estado = $_POST['estado'];
+                    
+                    if (guardar_tareas($id, $descripcion, $estado)) {
+                        echo "<p>Los datos se guardaron correctamente</p>";
+                    } else {
+                        echo "<p>Hubo un error a la hora de guardar los datos</p>";
+                    }
+                    
+                    ?>
+                    <!--Tabla para comprobar que se guardan los campos del formulario en el array-->
+                    <table class="table table-striped table-hover">
+                    <thead class="thead">
+                        <tr>                            
+                            <th>Identificador</th>
+                            <th>Descripción</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php devolver_lista_tareas($tareas);?>
+                    </tbody>
                 </div>
             </main>
         </div>
