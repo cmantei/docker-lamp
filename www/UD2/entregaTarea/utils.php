@@ -8,7 +8,6 @@ $tareas = [
     ["id" => "dwcs01", "descripcion" => "Lista de tareas", "estado" => "proceso"]
 ];
 
-
 function devolver_lista_tareas($tareas) {
     foreach ($tareas as $tarea) {
         echo "<tr>";
@@ -26,8 +25,7 @@ function filtrar_campos($campo) {
     return $campo;
 }
 
-//Los campos filtrados es posible que tengan mas caracteres que los originales por la conversion en caracteres html
-
+//Los campos filtrados es posible que tengan más caracteres que los originales por la conversión de htmlspecialchars
 
 function validacion_campos($campo) {
     if (!empty($campo) && strlen($campo) >= 3 && strlen($campo) <= 50) {
@@ -52,7 +50,7 @@ function guardar_tareas($id, $descripcion, $estado){
         if (!validacion_campos($id_filtrado)) {
             return "El id no es válido";
         }elseif (!validacion_campos($descripcion_filtrado)){
-            return "La descrición no es válida";
+            return "La descripción no es válida";
         }elseif (!validacion_campos($estado_filtrado)) {
             return "El estado no es válido";
         } else {

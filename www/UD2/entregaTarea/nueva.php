@@ -24,23 +24,11 @@
                     $id = $_POST['id'];
                     $descripcion = $_POST['descripcion'];
                     $estado = $_POST['estado'];
-                    
-                    var_dump(filtrar_campos($id));
-                    var_dump(filtrar_campos($descripcion));
-                    var_dump(filtrar_campos($estado));
-                    var_dump(validacion_campos($id));
-                    var_dump(validacion_campos($descripcion));
-                    
+                                        
                     $mensaje = guardar_tareas($id, $descripcion, $estado);
                     echo '<p>'.$mensaje.'</p>';
-
-                    //Los campos filtrados es posible que tengan mas caracteres que los originales por la conversion en caracteres html
-
-                    
-                    var_dump($tareas);
-
                     ?>
-                    <!--Tabla para comprobar que se guardan los campos del formulario en el array-->
+                    <p>Tabla para comprobar que se guardaron los campos del formulario en el array:</p>
                     <table class="table table-striped table-hover">
                     <thead class="thead">
                         <tr>                            
