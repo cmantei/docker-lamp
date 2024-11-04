@@ -18,10 +18,10 @@
                     <h2>Formulario para añadir tareas</h2>
                 </div>
                 <div class="container">
-                    <p>Rellenar los siguientes campos (mínimo 3 caracteres por campo):</p>
+                    <p>Rellenar los siguientes campos (mínimo 3 y máximo 50 caracteres por campo):</p>
                 
                     <form class="mb-5" method="POST" action="nueva.php">
-                        
+
                         <div class="mb-3">
                             <label class="form-label">Identificador</label>
                             <input class="form-control" type="text" name="id"/>

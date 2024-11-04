@@ -17,6 +17,9 @@
                 <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h2>Página principal</h2>
                 </div>
+                <div class="container">
+                    <p>Me llamo Carlos y me gustan las películas de ciencia ficción</p>
+                </div>
             </main>
         </div>
     </div>

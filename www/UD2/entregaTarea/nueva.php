@@ -31,13 +31,12 @@
                     var_dump(validacion_campos($id));
                     var_dump(validacion_campos($descripcion));
                     
+                    $mensaje = guardar_tareas($id, $descripcion, $estado);
+                    echo '<p>'.$mensaje.'</p>';
 
-                    if (guardar_tareas($id, $descripcion, $estado)) {
-                        echo "<p>Los datos se guardaron correctamente</p>";
-                    } else {
-                        echo "<p>Hubo un error al guardar los datos</p>";
-                    }
+                    //Los campos filtrados es posible que tengan mas caracteres que los originales por la conversion en caracteres html
 
+                    
                     var_dump($tareas);
 
                     ?>
