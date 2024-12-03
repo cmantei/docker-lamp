@@ -15,15 +15,14 @@ function listaUsuarios() {
     try {
         $conexion = conectaTareas();
         $sql = "SELECT id, username, nombre, apellidos FROM usuarios";
-        $stmt = $conexion->query($sql);
+        $stmt = $conexion->prepare($sql);
+        $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }catch (PDOException $e) {
+    } catch (PDOException $e) {
         return null;
-    }finally{
+    } finally {
         $conexion = null;
     }
-    
-        
 }
 
 function insertarUsuario($username, $nombre, $apellidos, $contrasena) {
@@ -83,6 +82,50 @@ function borrarUsuario($id_usuario) {
     } catch (PDOException $e) {
         return false;
     } finally{
+        $conexion = null;
+    }
+}
+
+function recuperarUsuarioPorId($id) {
+    try {
+        $conexion = conectaTareas();
+        $sql = "SELECT id, username, nombre, apellidos FROM usuarios WHERE id = :id";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return null;
+    } finally {
+        $conexion = null;
+    }
+}
+
+function actualizarUsuario($id, $username, $nombre, $apellidos, $contrasena = null) {
+    try{
+        $conexion = conectaTareas();
+        if (!empty($contrasena)) {
+            $sql = "UPDATE usuarios SET username = :username, nombre = :nombre, apellidos = :apellidos, contrasena = :contrasena WHERE id = :id";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            $stmt->bindParam(':apellidos', $apellidos, PDO::PARAM_STR);
+            $stmt->bindParam(':contrasena', $contrasena, PDO::PARAM_STR);
+        return $stmt->execute();
+        }else{
+            $sql = "UPDATE usuarios SET username = :username, nombre = :nombre, apellidos = :apellidos WHERE id = :id";
+            $stmt = $conexion->prepare($sql);
+            $stmt->bindParam(':id', $id, PDO::PARAM_INT);
+            $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+            $stmt->bindParam(':nombre', $nombre, PDO::PARAM_STR);
+            $stmt->bindParam(':apellidos', $apellidos, PDO::PARAM_STR);
+            return $stmt->execute();
+        }
+
+    } catch (PDOException $e) {
+        return null;
+    } finally {
         $conexion = null;
     }
 }
