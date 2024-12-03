@@ -129,3 +129,19 @@ function actualizarUsuario($id, $username, $nombre, $apellidos, $contrasena = nu
         $conexion = null;
     }
 }
+
+function filtrarTareas($id) {
+    try {
+        $conexion = conectaTareas();
+        $sql = "SELECT id, titulo, descripcion, estado FROM tareas WHERE id_usuario = :id_usuario";
+        $stmt = $conexion->prepare($sql);
+        $stmt->bindParam(':id_usuario', $id, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        return null;
+    } finally {
+        $conexion = null;
+    }
+}
+

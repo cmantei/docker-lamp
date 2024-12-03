@@ -18,7 +18,7 @@
                     <h2>Página principal</h2>
                 </div>
                 <div class="container">
-                    <p>Bienvenido</p>
+                    <p>EDITAR TAREA SIN IMPLEMENTAR</p>
                 </div>
             </main>
         </div>

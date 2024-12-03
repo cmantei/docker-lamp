@@ -22,7 +22,7 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="listaTareas.php">
+                <a class="nav-link" href="tareas.php">
                     Lista de tareas
                 </a>
             </li>

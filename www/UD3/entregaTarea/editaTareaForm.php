@@ -18,7 +18,7 @@
                     <h2>Página principal</h2>
                 </div>
                 <div class="container">
-                <p>Formulario para actualizar tareas</p>
+                <p>Formulario para actualizar tareas SIN IMPLEMENTAR</p>
                 
                 <form class="mb-5" method="POST" action="editaTarea.php">
 
