@@ -26,6 +26,8 @@
                 <th>Username</th>
                 <th>Nombre</th>
                 <th>Apellidos</th>
+                <th>Acciones</th>
+                
             </tr>
         </thead>
         <tbody>

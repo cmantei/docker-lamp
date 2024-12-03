@@ -27,6 +27,7 @@
                 <th>Descripción</th>
                 <th>Estado</th>
                 <th>Usuario</th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
