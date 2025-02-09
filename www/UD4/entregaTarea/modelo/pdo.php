@@ -12,6 +12,56 @@ function conectaPDO()
     return $conPDO;
 }
 
+function nuevoFichero($nombre, $ruta, $descripcion, $id_tarea)
+{
+    try {
+        $con = conectaPDO();
+        $stmt = $con->prepare("INSERT INTO ficheros (nombre, file, descripcion, id_tarea) VALUES (:nombre, :file, :descripcion, :id_tarea)");
+        
+        $stmt->bindParam(':nombre', $nombre);
+        $stmt->bindParam(':file', $ruta);
+        $stmt->bindParam(':descripcion', $descripcion);
+        $stmt->bindParam(':id_tarea', $id_tarea, PDO::PARAM_INT);
+        
+        $stmt->execute();
+        $stmt->closeCursor();
+        
+        return [true, null];
+    } catch (PDOException $e) {
+        return [false, $e->getMessage()];
+    } finally {
+        $con = null;
+    }
+}
+
+function listaFicheros($id_tarea)
+{
+    try {
+        $con = conectaPDO();
+        $sql = 'SELECT * FROM ficheros WHERE id_tarea = ' . $id_tarea;
+        $stmt = $con->prepare($sql);
+        $stmt->execute();
+
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        $ficheros = $stmt->fetchAll();
+
+        return [true, $ficheros];
+    } catch (PDOException $e) {
+        return [false, $e->getMessage()];
+    } finally {
+        $con = null;
+    }
+}
+
+function borrarFichero($id_archivo) {
+    $conexion = conectaPDO();
+    $stmt = $conexion->prepare("DELETE FROM ficheros WHERE id = :id");
+    $stmt->bindValue(":id", $id_archivo, PDO::PARAM_INT);
+    $stmt->execute();
+    $conexion = null;
+}
+
+
 function comprobarUsuario($nombre, $pass, $conPDO)
 {
     $consulta = "SELECT id, contrasena, rol FROM usuarios WHERE username=:nombre";

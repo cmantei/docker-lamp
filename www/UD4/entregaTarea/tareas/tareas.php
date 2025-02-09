@@ -1,12 +1,6 @@
-<?php
-session_start();
-if (!isset($_SESSION['usuario'])) {	
-    header("Location: ../login/login.php?redirect=true");
-    exit();
-}
-?>
+<?php include_once('../login/comprobarSesion.php');?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="<?php echo $tema; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +10,6 @@ if (!isset($_SESSION['usuario'])) {
 <body>
 
     <?php include_once('../vista/header.php'); ?>
-
     <div class="container-fluid">
         <div class="row">
             
@@ -76,7 +69,7 @@ if (!isset($_SESSION['usuario'])) {
                                             echo '<td>' . $tarea['estado'] . '</td>';
                                             echo '<td>' . $tarea['id_usuario'] . '</td>';
                                             echo '<td>';
-                                            echo '<a class="btn btn-sm btn-outline-primary ms-2" href="mostrarTarea.php?id=' . $tarea['id'] . '" role="button">Mostrar</a>';
+                                            echo '<a class="btn btn-sm btn-outline-primary ms-2" href="tarea.php?id=' . $tarea['id'] . '" role="button">Mostrar</a>';
                                             echo '<a class="btn btn-sm btn-outline-success ms-2" href="editaTareaForm.php?id=' . $tarea['id'] . '" role="button">Editar</a>';
                                             echo '<a class="btn btn-sm btn-outline-danger ms-2" href="borraTarea.php?id=' . $tarea['id'] . '" role="button">Borrar</a>';
                                             echo '</td>';

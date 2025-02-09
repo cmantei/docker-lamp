@@ -37,9 +37,8 @@ if($_SERVER["REQUEST_METHOD"]=="POST"){
     }
     else
     {   
-        //$user contiene $_SESSION['usuario']['nombre'], $_SESSION['usuario']['rol'] y $_SESSION['usuario']['id']
+        // $user contiene $_SESSION['usuario']['nombre'], $_SESSION['usuario']['rol'] y $_SESSION['usuario']['id']
         $_SESSION['usuario'] = $user;
-        //Redirigimos a index.php
         header('Location: ../index.php');
     }
 }

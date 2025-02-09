@@ -1,5 +1,9 @@
+<?php include_once('../login/comprobarSesion.php');
+
+$tema = isset($_COOKIE['tema']) ? $_COOKIE['tema'] : 'light';
+?>
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-bs-theme="<?php echo $tema; ?>">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
