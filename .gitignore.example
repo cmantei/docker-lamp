@@ -1,0 +1,6 @@
+upload/
+.DS_Store
+*/.DS_Store
+# Descomentar para no subir el fichero .env al repositorio
+#.env
+#www/files/*
