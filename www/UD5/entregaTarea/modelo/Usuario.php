@@ -1,19 +1,21 @@
 <?php
+
 class Usuario{
     
     private $id;
-    private $rol;
-    private $username;
     private $nombre;
     private $apellidos;
+    private $username;
     private $contrasena;
+    private $rol;
 
-    public function __construct($rol = '', $username = '', $nombre = '', $apellidos = '', $contrasena = ''){
-        $this->rol = $rol;
-        $this->username = $username;
+    public function __construct($nombre = '', $apellidos = '', $username = '', $contrasena = '', $rol = ''){
         $this->nombre = $nombre;
         $this->apellidos = $apellidos;
+        $this->username = $username;
         $this->contrasena = $contrasena;
+        $this->rol = $rol;
+
     }
 
     public function getId(){
@@ -21,13 +23,6 @@ class Usuario{
     }
     public function setId($id){
         $this->id = $id;
-    }
-
-    public function getRol(){
-        return $this->rol;
-    }
-    public function setRol($rol){
-        $this->rol = $rol;
     }
 
     public function getUsername(){
@@ -58,10 +53,17 @@ class Usuario{
         $this->contrasena = $contrasena;
     }
 
+    public function getRol(){
+        return $this->rol;
+    }
+    public function setRol($rol){
+        $this->rol = $rol;
+    }
+
     public function validar(): array {
 
         $errores = [];
-
+        
         if(empty($this->username) || !is_string($this->username) || strlen($this->username)< 3){
             $errores['username'] = 'El username es obligatorio y debe tener al menos 3 caracteres de longitud.';
         }

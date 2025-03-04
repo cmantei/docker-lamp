@@ -25,5 +25,5 @@ function esNumeroValido($campo)
 
 function validaContrasena($campo)
 {
-    return (!empty($campo) && validarLargoCampo($campo, 7));
+    return (!empty($campo) && validarLargoCampo($campo, 6));
 }

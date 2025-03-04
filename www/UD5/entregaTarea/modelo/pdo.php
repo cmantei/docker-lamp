@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/Usuario.php');
+
 function conectaPDO()
 {
     $servername = $_ENV['DATABASE_HOST'];
@@ -63,16 +65,16 @@ function listaTareasPDO($id_usuario, $estado)
     
 }
 
-function nuevoUsuario($nombre, $apellidos, $username, $contrasena, $rol=0)
+function nuevoUsuario($usuario)
 {
     try{
         $con = conectaPDO();
         $stmt = $con->prepare("INSERT INTO usuarios (nombre, apellidos, username, rol, contrasena) VALUES (:nombre, :apellidos, :username, :rol, :contrasena)");
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':apellidos', $apellidos);
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':rol', $rol);
-        $hasheado = password_hash($contrasena, PASSWORD_DEFAULT);
+        $stmt->bindParam(':nombre', $usuario->getNombre());
+        $stmt->bindParam(':apellidos', $usuario->getApellidos());
+        $stmt->bindParam(':username', $usuario->getUsername());
+        $stmt->bindParam(':rol', $usuario->getRol());
+        $hasheado = password_hash($usuario->getContrasena(), PASSWORD_DEFAULT);
         $stmt->bindParam(':contrasena', $hasheado);
         $stmt->execute();
         
