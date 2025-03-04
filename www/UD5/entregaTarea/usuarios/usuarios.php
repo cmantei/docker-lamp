@@ -1,23 +1,23 @@
 <?php
-    require_once('../login/sesiones.php');
+    require_once(__DIR__ . '/../login/sesiones.php');
     if (!checkAdmin()) redirectIndex();
 ?>
-    <?php include_once('../vista/header.php'); ?>
+    <?php include_once(__DIR__ . '/../vista/header.php'); ?>
 
     <div class="container-fluid">
         <div class="row">
             
-            <?php include_once('../vista/menu.php'); ?>
+            <?php include_once(__DIR__ . '/../vista/menu.php'); ?>
 
             <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
                 <div class="container justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                     <h2>Usuarios</h2>
-                    <?php include_once ('../vista/erroresGet.php'); ?>
+                    <?php include_once (__DIR__ . '/../vista/erroresGet.php'); ?>
                 </div>
 
                 <div class="container justify-content-between">
                 <?php
-                    require_once('../modelo/pdo.php');
+                    require_once(__DIR__ . '/../modelo/pdo.php');
                     $resultado = listaUsuarios();
                     if ($resultado[0])
                     {
@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <?php include_once('../vista/footer.php'); ?>
+    <?php include_once(__DIR__ . '/../vista/footer.php'); ?>
     
 </body>
 </html>

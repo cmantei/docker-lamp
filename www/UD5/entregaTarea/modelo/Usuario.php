@@ -9,7 +9,7 @@ class Usuario{
     private $contrasena;
     private $rol;
 
-    public function __construct($nombre = '', $apellidos = '', $username = '', $contrasena = '', $rol = ''){
+    public function __construct($nombre = '', $apellidos = '', $username = '', $contrasena = '', $rol = 0){
         $this->nombre = $nombre;
         $this->apellidos = $apellidos;
         $this->username = $username;
@@ -78,7 +78,7 @@ class Usuario{
             $errores['contrasena'] = 'La contraseña tiene que tener al menos 6 caracteres de longitud';
         }
 
-        if(empty($this->rol)){
+        if(($this->rol != 0) && ($this->rol != 1)) {
             $errores['rol'] = 'Es necesario seleccionar un rol para continuar';
         }
 
