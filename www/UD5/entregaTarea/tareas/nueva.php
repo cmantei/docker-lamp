@@ -2,61 +2,44 @@
 require_once(__DIR__ . '/../login/sesiones.php');
 require_once(__DIR__ . '/../utils.php');
 require_once(__DIR__ . '/../modelo/mysqli.php');
+require_once(__DIR__ . '/../modelo/pdo.php');
+require_once(__DIR__ . '/../modelo/Tarea.php');
 
-$titulo = $_POST['titulo'];
-$descripcion = $_POST['descripcion'];
-$estado = $_POST['estado'];
-$id_usuario = $_POST['id_usuario'];
 
-$response = 'error';
-$messages = array();
-$location = 'nuevaForm.php';
+$titulo = filtraCampo($_POST['titulo']);
+$descripcion = filtraCampo($_POST['descripcion']);
+$estado = filtraCampo($_POST['estado']);
+$id_usuario = filtraCampo($_POST['id_usuario']);
 
-$error = false;
+$usuario = buscaUsuario($id_usuario)[1];
 
-if (!checkAdmin()) $id_usuario = $_SESSION['usuario']['id'];
-
-//verificar titulo
-if (!validarCampoTexto($titulo))
-{
-    $error = true;
-    array_push($messages, 'El campo titulo es obligatorio y debe contener al menos 3 caracteres.');
-}
-//verificar descripcion
-if (!validarCampoTexto($descripcion))
-{
-    $error = true;
-    array_push($messages, 'El campo descripcion es obligatorio y debe contener al menos 3 caracteres.');
-}
-//verificar estado
-if (!validarCampoTexto($estado))
-{
-    $error = true;
-    array_push($messages, 'El campo estado es obligatorio.');
-}
-//verificar id_usuario
-if (!esNumeroValido($id_usuario))
-{
-    $error = true;
-    array_push($messages, 'El campo usuario es obligatorio.');
+if (!$usuario) {
+    $_SESSION['status'] = 'error';
+    $_SESSION['messages'] = ['No se encontró el usuario'];
+    header("Location: nuevaForm.php");
+    exit;
 }
 
-if (!$error)
-{
-    $resultado = nuevaTarea(filtraCampo($titulo), filtraCampo($descripcion), filtraCampo($estado), filtraCampo($id_usuario));
-    if ($resultado[0])
-    {
-        $response = 'success';
-        array_push($messages, 'Tarea guardada correctamente.');
-    }
-    else
-    {
-        $response = 'error';
-        array_push($messages, 'Ocurrió un error guardando la tarea: ' . $resultado[1] . '.');
-    }
+$tarea = new Tarea($titulo, $descripcion, $estado, $usuario);
+
+$errores = $tarea->validar();
+
+if(!empty($errores)){
+    $_SESSION['status'] = 'error';
+    $_SESSION['messages'] = $errores;
+    header("Location: nuevaForm.php");
+    exit;
 }
 
-$_SESSION['status'] = $response;
-$_SESSION['messages'] = $messages;
+$resultado = nuevaTarea($tarea);
 
-header("Location: $location");
+if ($resultado[0]) {
+    $_SESSION['status'] = 'success';
+    $_SESSION['messages'] = ['Tarea guardada correctamente.'];
+} else {
+    $_SESSION['status'] = 'error';
+    $_SESSION['messages'] = ['Ocurrió un error guardando la tarea: ' . $resultado[1]];
+}
+
+header("Location: nuevaForm.php");
+exit;

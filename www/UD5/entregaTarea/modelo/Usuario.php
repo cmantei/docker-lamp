@@ -1,5 +1,7 @@
 <?php
 
+require_once(__DIR__ . '/../utils.php');
+
 class Usuario{
     
     private $id;
@@ -61,49 +63,62 @@ class Usuario{
     }
 
     public function validar(): array {
-
-        $errores = [];
-        
-        if(empty($this->username) || !is_string($this->username) || strlen($this->username)< 3){
-            $errores['username'] = 'El username es obligatorio y debe tener al menos 3 caracteres de longitud.';
-        }
-        if(empty($this->nombre) || !is_string($this->nombre) || strlen($this->nombre)< 3){
-            $errores['nombre'] = 'El nombre es obligatorio y debe tener al menos 3 caracteres de longitud.';
-        }
-        if(empty($this->apellidos) || !is_string($this->apellidos) || strlen($this->apellidos)< 3){
-            $errores['apellidos'] = 'Los apellidos son obligatorios y deben tener al menos 3 caracteres de longitud.';
-        }
-
-        if(empty($this->contrasena) || !is_string($this->contrasena) || strlen($this->contrasena)< 6){
-            $errores['contrasena'] = 'La contraseña tiene que tener al menos 6 caracteres de longitud';
-        }
-
-        if(($this->rol != 0) && ($this->rol != 1)) {
-            $errores['rol'] = 'Es necesario seleccionar un rol para continuar';
-        }
-
-        return $errores;
-
-    }
-
-    public function validarSinContrasena(): array {
-
         $errores = [];
     
-        if(empty($this->username) || !is_string($this->username) || strlen($this->username) < 3){
-            $errores['username'] = 'El username es obligatorio y debe tener al menos 3 caracteres de longitud.';
+        // Verificar el campo nombre
+        if (!validarCampoTexto($this->nombre)) {
+            $errores['nombre'] = 'El campo nombre es obligatorio y debe contener al menos 3 caracteres.';
         }
-        if(empty($this->nombre) || !is_string($this->nombre) || strlen($this->nombre) < 3){
-            $errores['nombre'] = 'El nombre es obligatorio y debe tener al menos 3 caracteres de longitud.';
+    
+        // Verificar el campo apellidos
+        if (!validarCampoTexto($this->apellidos)) {
+            $errores['apellidos'] = 'El campo apellidos es obligatorio y debe contener al menos 3 caracteres.';
         }
-        if(empty($this->apellidos) || !is_string($this->apellidos) || strlen($this->apellidos) < 3){
-            $errores['apellidos'] = 'Los apellidos son obligatorios y deben tener al menos 3 caracteres de longitud.';
+    
+        // Verificar el campo username
+        if (!validarCampoTexto($this->username)) {
+            $errores['username'] = 'El campo username es obligatorio y debe contener al menos 3 caracteres.';
         }
-        if(($this->rol != 0) && ($this->rol != 1)) {
-            $errores['rol'] = 'Es necesario seleccionar un rol para continuar';
+    
+        // Verificar el campo contraseña
+        if (!validaContrasena($this->contrasena)) {
+            $errores['contrasena'] = 'El campo contraseña es obligatorio y debe ser compleja.';
         }
+    
+        // Verificar rol
+        if ($this->rol != 0 && $this->rol != 1) {
+            $errores['rol'] = 'Es necesario seleccionar un rol para continuar.';
+        }
+    
         return $errores;
     }
+    
+    public function validarSinContrasena(): array {
+        $errores = [];
+    
+        // Verificar el campo nombre
+        if (!validarCampoTexto($this->nombre)) {
+            $errores['nombre'] = 'El campo nombre es obligatorio y debe contener al menos 3 caracteres.';
+        }
+    
+        // Verificar el campo apellidos
+        if (!validarCampoTexto($this->apellidos)) {
+            $errores['apellidos'] = 'El campo apellidos es obligatorio y debe contener al menos 3 caracteres.';
+        }
+    
+        // Verificar el campo username
+        if (!validarCampoTexto($this->username)) {
+            $errores['username'] = 'El campo username es obligatorio y debe contener al menos 3 caracteres.';
+        }
+    
+        // Verificar rol
+        if ($this->rol != 0 && $this->rol != 1) {
+            $errores['rol'] = 'Es necesario seleccionar un rol para continuar.';
+        }
+    
+        return $errores;
+    }
+    
     
 
 }

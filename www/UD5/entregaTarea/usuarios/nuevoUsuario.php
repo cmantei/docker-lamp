@@ -4,7 +4,6 @@ if (!checkAdmin()) redirectIndex();
 
 require_once(__DIR__ . '/../utils.php');
 
-// Filtrado de campos recibidos por el formulario
 $nombre = filtraCampo($_POST['nombre']);
 $apellidos = filtraCampo($_POST['apellidos']);
 $username = filtraCampo($_POST['username']);

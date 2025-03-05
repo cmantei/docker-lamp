@@ -15,7 +15,7 @@ require_once(__DIR__ . '/../modelo/Usuario.php');
 $usuario = new Usuario($nombre, $apellidos, $username, $contrasena, $rol);
 $usuario->setId($id);
 
-// Validacion de campos con los metodos de la clase Usuario
+// Validacion de campos con los metodos de Usuario
 
 if(empty($contrasena)){
     $errores = $usuario->validarSinContrasena();
@@ -48,18 +48,6 @@ if (!empty($errores)) {
         $error = true;
     }
 }
-
-/*
-    if ($resultado[0]) {
-        // Mensaje de exito
-        $message = '<div class="alert alert-success" role="alert">Usuario guardado correctamente.</div>';
-    } else {
-        // Mensaje de error
-        $message = '<div class="alert alert-danger" role="alert">Ocurrió un error guardando el usuario: ' . $resultado[1] . '</div>';
-        $error = true;
-    }
-}
-    */
 
 $status = $error ? 'error' : 'success';
 header("Location: editaUsuarioForm.php?id=$id&status=$status&message=$message");

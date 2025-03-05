@@ -1,6 +1,8 @@
 <?php
 
 require_once(__DIR__ . '/Usuario.php');
+require_once(__DIR__ . '/Tarea.php');
+
 
 function conectaPDO()
 {
@@ -66,9 +68,15 @@ function listaTareasPDO($id_usuario, $estado)
         $tareas = array();
         while ($row = $stmt->fetch())
         {
-            $usuario = buscaUsuario($row['id_usuario']);
-            $row['id_usuario'] = $usuario['username'];
-            array_push($tareas, $row);
+            // Objeto Usuario
+            $resultado = buscaUsuario($row['id_usuario']);
+            $usuario = $resultado[1];
+
+            // Objeto Tarea
+            $tarea = new Tarea($row['titulo'], $row['descripcion'], $row['estado'], $usuario);
+            $tarea->setId($row['id']);
+
+            array_push($tareas, $tarea);
         }
         return [true, $tareas];
     }
@@ -326,16 +334,24 @@ function borraFichero($id)
     }
 }
 
-function nuevoFichero($file, $nombre, $descripcion, $idTarea)
+function nuevoFichero(Fichero $fichero)
 {
     try
     {
         $con = conectaPDO();
+        
+        $nombre = $fichero->getNombre();
+        $file = $fichero->getFile();
+        $descripcion = $fichero->getDescripcion();
+        $idTarea = $fichero->getTarea()->getId();
+
         $stmt = $con->prepare("INSERT INTO ficheros (nombre, file, descripcion, id_tarea) VALUES (:nombre, :file, :descripcion, :idTarea)");
+        
         $stmt->bindParam(':file', $file);
         $stmt->bindParam(':nombre', $nombre);
         $stmt->bindParam(':descripcion', $descripcion);
         $stmt->bindParam(':idTarea', $idTarea);
+        
         $stmt->execute();
         
         $stmt->closeCursor();

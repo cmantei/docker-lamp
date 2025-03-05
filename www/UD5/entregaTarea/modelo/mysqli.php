@@ -1,5 +1,8 @@
 <?php
 
+require_once(__DIR__ . '/Usuario.php');
+require_once(__DIR__ . '/Tarea.php');
+
 function conecta($host, $user, $pass, $db)
 {
     $conexion = new mysqli($host, $user, $pass, $db);
@@ -203,9 +206,13 @@ function listaTareas()
             $tareas = array();
             while ($row = $resultados->fetch_assoc())
             {
-                $usuario = buscaUsuarioMysqli($row['id_usuario']);
-                $row['id_usuario'] = $usuario['username'];
-                array_push($tareas, $row);
+                //$usuario = buscaUsuarioMysqli($row['id_usuario']);
+                $resultado = buscaUsuario($row['id_usuario']);
+                $usuario = $resultado[1];
+
+                $tarea = new Tarea($row['titulo'], $row['descripcion'], $row['estado'], $usuario);
+                $tarea->setId($row['id']);
+                array_push($tareas, $tarea);
             }
             return [true, $tareas];
         }
@@ -220,7 +227,7 @@ function listaTareas()
     }
 }
 
-function nuevaTarea($titulo, $descripcion, $estado, $usuario)
+function nuevaTarea($tarea)
 {
     try {
         $conexion = conectaTareas();
@@ -231,8 +238,19 @@ function nuevaTarea($titulo, $descripcion, $estado, $usuario)
         }
         else
         {
+
+            $titulo = $tarea->getTitulo();
+            $descripcion = $tarea->getDescripcion();
+            $estado = $tarea->getEstado();
+            $usuario = $tarea->getUsuario();
+            $id_usuario = $usuario->getId();
+
+            if (!$id_usuario) {
+                return [false, "No existe un id de usuario asociado a la tarea."];
+            }
+
             $stmt = $conexion->prepare("INSERT INTO tareas (titulo, descripcion, estado, id_usuario) VALUES (?,?,?,?)");
-            $stmt->bind_param("ssss", $titulo, $descripcion, $estado, $usuario);
+            $stmt->bind_param("ssss", $titulo, $descripcion, $estado, $id_usuario);
 
             $stmt->execute();
 
@@ -249,17 +267,23 @@ function nuevaTarea($titulo, $descripcion, $estado, $usuario)
     }
 }
 
-function actualizaTarea($id, $titulo, $descripcion, $estado, $usuario)
+function actualizaTarea($tarea)
 {
     try {
         $conexion = conectaTareas();
-        
+
         if ($conexion->connect_error)
         {
             return [false, $conexion->error];
         }
         else
         {
+            $titulo = $tarea->getTitulo();
+            $descripcion = $tarea->getDescripcion();
+            $estado = $tarea->getEstado();
+            $usuario = $tarea->getUsuario()->getId();
+            $id = $tarea->getId();
+
             $sql = "UPDATE tareas SET titulo = ?, descripcion = ?, estado = ?, id_usuario = ? WHERE id = ?";
             $stmt = $conexion->prepare($sql);
             $stmt->bind_param("sssii", $titulo, $descripcion, $estado, $usuario, $id);
@@ -278,6 +302,7 @@ function actualizaTarea($id, $titulo, $descripcion, $estado, $usuario)
         cerrarConexion($conexion);
     }
 }
+
 
 function borraTarea($id)
 {
@@ -318,7 +343,7 @@ function buscaTarea($id)
 
     if ($conexion->connect_error)
     {
-        return [false, $conexion->error];
+        return null;
     }
     else
     {
@@ -326,7 +351,14 @@ function buscaTarea($id)
         $resultados = $conexion->query($sql);
         if ($resultados->num_rows == 1)
         {
-            return $resultados->fetch_assoc();
+            $row = $resultados->fetch_assoc();
+
+            $usuario = buscaUsuarioMysqli($row['id_usuario']);
+
+            $tarea = new Tarea($row['titulo'], $row['descripcion'], $row['estado'], $usuario);
+            $tarea->setId($row['id']);
+
+            return $tarea;
         }
         else
         {
@@ -335,12 +367,14 @@ function buscaTarea($id)
     }
 }
 
+
+
 function esPropietarioTarea($idUsuario, $idTarea)
 {
     $tarea = buscaTarea($idTarea);
     if ($tarea)
     {
-        return $tarea['id_usuario'] == $idUsuario;
+        return $tarea->getUsuario()->getId() == $idUsuario;
     }
     else
     {
@@ -354,15 +388,20 @@ function buscaUsuarioMysqli($id)
 
     if ($conexion->connect_error)
     {
-        return [false, $conexion->error];
+        return null;
     }
     else
     {
-        $sql = "SELECT id, username, nombre, apellidos, rol, contrasena  FROM usuarios WHERE id = " . $id;
+        $sql = "SELECT id, username, nombre, apellidos, rol, contrasena FROM usuarios WHERE id = " . $id;
         $resultados = $conexion->query($sql);
+
         if ($resultados->num_rows == 1)
         {
-            return $resultados->fetch_assoc();
+            $row = $resultados->fetch_assoc();
+
+            $usuario = new Usuario($row['id'], $row['username'], $row['nombre'], $row['apellidos'], $row['rol'], $row['contrasena']);
+
+            return $usuario;
         }
         else
         {

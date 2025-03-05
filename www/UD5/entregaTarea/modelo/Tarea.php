@@ -1,12 +1,14 @@
 <?php
 
+require_once(__DIR__ . '/../utils.php');
+
 class Tarea{
 
     private $id;
     private $titulo;
     private $descripcion;
     private $estado;
-    private $usuario;
+    private Usuario $usuario;
 
     public function __construct($titulo, $descripcion, $estado, Usuario $usuario){
         $this->titulo = $titulo;
@@ -57,7 +59,24 @@ class Tarea{
     }
 
 
+    public function validar(): array {
+        $errores = [];
 
+        if (!validarCampoTexto($this->titulo)) {
+            $errores['titulo'] = 'El campo título es obligatorio y debe contener al menos 3 caracteres.';
+        }
+        if (!validarCampoTexto($this->descripcion)) {
+            $errores['descripcion'] = 'El campo descripción es obligatorio y debe contener al menos 3 caracteres.';
+        }
+        if (!validarCampoTexto($this->estado)) {
+            $errores['estado'] = 'El campo estado es obligatorio.';
+        }
+        if (!$this->usuario instanceof Usuario || !esNumeroValido($this->usuario->getId())) {
+            $errores['usuario'] = 'El campo usuario no es válido.';
+        }
+
+        return $errores;
+    }
 
 
 }
