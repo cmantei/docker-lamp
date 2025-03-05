@@ -24,7 +24,7 @@ if (checkAdmin())
         <select class="form-select" id="id_usuario" name="id_usuario" required>
             <option value="" <?php echo isset($id_usuario) ? '' : 'selected' ?> disabled>Seleccione el usuario</option>
             <?php
-                require_once('../modelo/pdo.php');
+                require_once(__DIR__ . '/../modelo/pdo.php');
                 $usuarios = listaUsuarios()[1];
                 foreach ($usuarios as $usuario) { ?>
                     <option value="<?php echo ($usuario['id']); ?>" <?php echo isset($id_usuario) && $id_usuario == $usuario['id'] ? 'selected' : '' ?> >

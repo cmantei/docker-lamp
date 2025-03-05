@@ -1,6 +1,6 @@
 <?php
-require_once('../login/sesiones.php');
-require_once('../utils.php');
+require_once(__DIR__ . '/../login/sesiones.php');
+require_once(__DIR__ . '/../utils.php');
 
 $id = $_POST['id'];
 $titulo = $_POST['titulo'];
@@ -44,7 +44,7 @@ if (!esNumeroValido($id_usuario))
 
 if (!$error)
 {
-    require_once('../modelo/mysqli.php');
+    require_once(__DIR__ . '/../modelo/mysqli.php');
     $resultado = actualizaTarea($id, filtraCampo($titulo), filtraCampo($descripcion), filtraCampo($estado), $id_usuario);
     if ($resultado[0])
     {

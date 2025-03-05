@@ -1,7 +1,7 @@
 <?php
 
-require_once('../login/sesiones.php');    
-require_once('../modelo/mysqli.php');
+require_once(__DIR__ . '/../login/sesiones.php');    
+require_once(__DIR__ . '/../modelo/mysqli.php');
 
 $response = 'error';
 $messages = array();
