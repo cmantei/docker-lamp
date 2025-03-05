@@ -86,6 +86,26 @@ class Usuario{
 
     }
 
+    public function validarSinContrasena(): array {
+
+        $errores = [];
+    
+        if(empty($this->username) || !is_string($this->username) || strlen($this->username) < 3){
+            $errores['username'] = 'El username es obligatorio y debe tener al menos 3 caracteres de longitud.';
+        }
+        if(empty($this->nombre) || !is_string($this->nombre) || strlen($this->nombre) < 3){
+            $errores['nombre'] = 'El nombre es obligatorio y debe tener al menos 3 caracteres de longitud.';
+        }
+        if(empty($this->apellidos) || !is_string($this->apellidos) || strlen($this->apellidos) < 3){
+            $errores['apellidos'] = 'Los apellidos son obligatorios y deben tener al menos 3 caracteres de longitud.';
+        }
+        if(($this->rol != 0) && ($this->rol != 1)) {
+            $errores['rol'] = 'Es necesario seleccionar un rol para continuar';
+        }
+        return $errores;
+    }
+    
+
 }
 
 

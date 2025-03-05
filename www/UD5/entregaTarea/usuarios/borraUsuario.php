@@ -1,26 +1,31 @@
 <?php
-require_once('../login/sesiones.php');
+require_once(__DIR__ . '/../login/sesiones.php');
 if (!checkAdmin()) redirectIndex();
 
 $message = 'Error borrando el usuario.';
 $error = true;
 
-require_once('../modelo/pdo.php');
+require_once(__DIR__ . '/../modelo/pdo.php');
 
 if (!empty($_GET))
 {
     $id = $_GET['id'];
     if (!empty($id))
     {
-        $resultado = borraUsuario($id);
-        if ($resultado[0])
-        {
-            $message = 'Usuario borrado correctamente.';
-            $error = false;
-        }
-        else
-        {
-            $message = 'No se pudo borrar el usuario.';
+        $usuario = buscaUsuario($id);
+        if ($usuario[0]){
+            $resultado = borraUsuario($usuario[1]);
+
+            if ($resultado[0])
+            {
+                $message = 'Usuario borrado correctamente.';
+                $error = false;
+            }
+            else
+            {
+                $message = 'No se pudo borrar el usuario.';
+            }
+
         }
     }
     else

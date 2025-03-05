@@ -21,9 +21,25 @@ function listaUsuarios()
         $stmt = $con->prepare('SELECT id, username, nombre, apellidos, rol, contrasena FROM usuarios');
         $stmt->execute();
 
-        $result = $stmt->setFetchMode(PDO::FETCH_ASSOC);
+        $stmt->setFetchMode(PDO::FETCH_ASSOC);
         $resultados = $stmt->fetchAll();
-        return [true, $resultados];
+
+        $usuarios = [];
+        foreach ($resultados as $fila){
+            $usuario = new Usuario();
+
+            $usuario->setId($fila['id']);
+            $usuario->setUsername($fila['username']);
+            $usuario->setNombre($fila['nombre']);
+            $usuario->setApellidos($fila['apellidos']);
+            $usuario->setRol($fila['rol']);
+            $usuario->setContrasena($fila['contrasena']);
+
+            $usuarios[] = $usuario;
+
+        }
+
+        return [true, $usuarios];
     }
     catch (PDOException $e) {
         return [false, $e->getMessage()];
@@ -99,13 +115,13 @@ function nuevoUsuario($usuario)
     }
 }
 
-function actualizaUsuario($id, $nombre, $apellidos, $username, $contrasena, $rol)
+function actualizaUsuario($usuario)
 {
-    try{
+    try {
         $con = conectaPDO();
         $sql = "UPDATE usuarios SET nombre = :nombre, apellidos = :apellidos, username = :username, rol = :rol";
 
-        if (isset($contrasena))
+        if (!empty($usuario->getContrasena())) 
         {
             $sql = $sql . ', contrasena = :contrasena';
         }
@@ -113,43 +129,45 @@ function actualizaUsuario($id, $nombre, $apellidos, $username, $contrasena, $rol
         $sql = $sql . ' WHERE id = :id';
 
         $stmt = $con->prepare($sql);
-        $stmt->bindParam(':nombre', $nombre);
-        $stmt->bindParam(':apellidos', $apellidos);
-        $stmt->bindParam(':username', $username);
-        $stmt->bindParam(':rol', $rol);
-        if (isset($contrasena))
+        $stmt->bindValue(':nombre', $usuario->getNombre());
+        $stmt->bindValue(':apellidos', $usuario->getApellidos());
+        $stmt->bindValue(':username', $usuario->getUsername());
+        $stmt->bindValue(':rol', $usuario->getRol());
+
+        if (!empty($usuario->getContrasena())) 
         {
-            $hasheado = password_hash($contrasena, PASSWORD_DEFAULT);
-            $stmt->bindParam(':contrasena', $hasheado);
+            $hasheado = password_hash($usuario->getContrasena(), PASSWORD_DEFAULT);
+            $stmt->bindValue(':contrasena', $hasheado);
         }
-        $stmt->bindParam(':id', $id);
+
+        $stmt->bindValue(':id', $usuario->getId());
 
         $stmt->execute();
-        
         $stmt->closeCursor();
 
         return [true, null];
-    }
-    catch (PDOException $e)
+    } 
+    catch (PDOException $e) 
     {
         return [false, $e->getMessage()];
-    }
-    finally
+    } 
+    finally 
     {
         $con = null;
     }
 }
 
-function borraUsuario($id)
+
+function borraUsuario($usuario)
 {
     try {
         $con = conectaPDO();
 
         $con->beginTransaction();
 
-        $stmt = $con->prepare('DELETE FROM tareas WHERE id_usuario = ' . $id);
+        $stmt = $con->prepare('DELETE FROM tareas WHERE id_usuario = ' . $usuario->getId());
         $stmt->execute();
-        $stmt = $con->prepare('DELETE FROM usuarios WHERE id = ' . $id);
+        $stmt = $con->prepare('DELETE FROM usuarios WHERE id = ' . $usuario->getId());
         $stmt->execute();
         
         return [$con->commit(), ''];
@@ -176,7 +194,17 @@ function buscaUsuario($id)
 
         if ($stmt->rowCount() == 1)
         {
-            return $stmt->fetch();
+            $fila = $stmt->fetch();
+
+            $usuario = new Usuario();
+            $usuario->setId($fila['id']);
+            $usuario->setUsername($fila['username']);
+            $usuario->setNombre($fila['nombre']);
+            $usuario->setApellidos($fila['apellidos']);
+            $usuario->setRol($fila['rol']);
+            $usuario->setContrasena($fila['contrasena']);
+
+            return [true, $usuario];
         }
         else
         {
