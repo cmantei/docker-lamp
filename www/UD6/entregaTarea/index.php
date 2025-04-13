@@ -8,13 +8,29 @@ $pass = $_ENV['DATABASE_PASSWORD'];
 
 Flight::register('db', 'PDO', array("mysql:host=$host;dbname=$name", $user, $pass));
 
-
 // Registrar usuarios
 Flight::route('POST /register', function(){
 
     $nombre = Flight::request()->data->nombre;
     $email = Flight::request()->data->email;
     $password = Flight::request()->data->password;
+
+    if(!$nombre || !$email || !$password){
+        Flight::json(["Incluye los campos nombre, email y password en la solicitud."], 400);
+        Flight::stop();
+        exit();
+    }
+
+    $stmt = Flight::db()->prepare("SELECT * FROM usuarios WHERE email = :email");
+    $stmt->bindParam(":email", $email);
+    $stmt->execute();
+    $emailRegistrado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if($emailRegistrado){
+        Flight::json(["Ya existe un usuario registrado con ese email."], 400);
+        Flight::stop();
+        exit();
+    }
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
@@ -30,9 +46,10 @@ Flight::route('POST /register', function(){
 
     $sentencia->execute();
 
-    Flight::jsonp(["Usuario registrado correctamente"]);
+    Flight::json(["Usuario $email registrado correctamente"]);
 });
 
+/*
 // Consultar usuarios
 Flight::route('GET /usuarios', function(){
     $sentencia = Flight::db()->prepare("SELECT * FROM usuarios");
@@ -40,12 +57,19 @@ Flight::route('GET /usuarios', function(){
     $datos = $sentencia->fetchAll();
     Flight::json($datos);
 });
+*/
 
 // Iniciar sesion con un usuario. Crea un token único cada login asociado al usuario, actualiza la BD y lo devuelve en la cabecera de la peticion
 Flight::route('POST /login', function(){
 
     $email = Flight::request()->data->email;
     $password = Flight::request()->data->password;
+
+    if(!$email || !$password){
+        Flight::json(["Incluye los campos email y password en la solicitud para iniciar sesion."], 400);
+        Flight::stop();
+        exit();
+    }
 
     $sentencia = Flight::db()->prepare("SELECT password FROM usuarios WHERE email = :email");
     $sentencia->bindParam(':email', $email);
@@ -54,12 +78,15 @@ Flight::route('POST /login', function(){
     $usuario = $sentencia->fetch(PDO::FETCH_ASSOC);
 
     if (!$usuario) {
-        //Equivalente a stop mas exit mas mensaje
-        Flight::halt(404, 'Usuario no encontrado.');
+        Flight::json(["No existe un usuario registrado con el email proporcionado"], 404);
+        Flight::stop();
+        exit();
     }
 
     if (!password_verify($password, $usuario['password'])) {
-        Flight::halt(401, 'Contraseña incorrecta.');
+        Flight::json(["La contraseña no es correcta"], 401);
+        Flight::stop();
+        exit();
     }
 
     $token = bin2hex(random_bytes(32));
@@ -69,16 +96,8 @@ Flight::route('POST /login', function(){
     $update->bindParam(':email', $email);
     $update->execute();
 
-    $sentencia = Flight::db()->prepare("SELECT * FROM usuarios WHERE email = :email");
-    $sentencia->bindParam(':email', $email);
-    $sentencia->execute();
-    $datosUsuario = $sentencia->fetch(PDO::FETCH_ASSOC);
-
-    Flight::set('user', $datosUsuario);
-
     Flight::response()->header('X-Token', $token);
-    Flight::json(['Inicio de sesion con exito']);
-
+    Flight::json(["Inicio de sesion del usuario $email con exito. Se ha enviado el token de autenticacion en la cabecera de la respuesta."]);
 });
 
 function buscarUsuario(){
@@ -100,7 +119,9 @@ function verificarUsuario(){
     $datosUsuario = buscarUsuario();
 
     if(!$datosUsuario){
-        Flight::halt(401, 'Acceso no autorizado. Es necesario un token valido');
+        Flight::json(["Acceso no autorizado. Es necesario un token valido."], 401);
+        Flight::stop();
+        exit();
     }
     return $datosUsuario;
 }
@@ -113,7 +134,7 @@ function devolverContacto($id_contacto){
     return $datos;
 }
 
-// Añadir contactos si el usuario esta autenticado (token enviado en la cabecera se encuentra en la base de datos)
+// Añadir contactos si el token enviado por el usuario en la cabecera se encuentra en la base de datos, lo que acredita su autenticacion
 Flight::route('POST /contactos', function(){
 
     $datosUsuario = verificarUsuario();
@@ -135,7 +156,6 @@ Flight::route('POST /contactos', function(){
 });
 
 // Listar los contactos del usuario autenticado
-
 Flight::route('GET /contactos(/@id)', function($id = null){
 
     $datosUsuario = verificarUsuario();
@@ -144,11 +164,15 @@ Flight::route('GET /contactos(/@id)', function($id = null){
         $datosContacto = devolverContacto($id);
 
         if(!$datosContacto){
-            Flight::halt(404, 'El contacto solicitado no existe en la base de datos');
+            Flight::json(["No se encuentra el contacto en la base de datos"], 404);
+            Flight::stop();
+            exit();
         }
 
         if($datosContacto['usuario_id'] != $id_usuario){
-            Flight::halt(403, 'Acceso a contacto no autorizado');
+            Flight::json(["No esta autorizado a acceder al contacto indicado"], 403);
+            Flight::stop();
+            exit();
         }
 
         Flight::json($datosContacto);
@@ -163,7 +187,6 @@ Flight::route('GET /contactos(/@id)', function($id = null){
 });
 
 // Actualizar los contactos del usuario autenticado
-
 Flight::route('PUT /contactos', function(){
     
     $datosUsuario = verificarUsuario();
@@ -177,11 +200,15 @@ Flight::route('PUT /contactos', function(){
     $datosContacto = devolverContacto($id);
 
     if(!$datosContacto){
-        Flight::halt(404, 'El contacto solicitado no existe en la base de datos');
+        Flight::json(["No se encuentra el contacto en la base de datos"], 404);
+        Flight::stop();
+        exit();
     }
 
     if($datosContacto['usuario_id'] != $id_usuario){
-        Flight::halt(403, 'Acceso a contacto no autorizado');
+        Flight::json(["No esta autorizado a acceder al contacto indicado"], 403);
+        Flight::stop();
+        exit();
     }
 
     $sql = "UPDATE contactos set nombre = :nombre, telefono = :telefono, email = :email WHERE id = :id";
@@ -200,13 +227,18 @@ Flight::route('DELETE /contactos', function(){
     $id = Flight::request()->data->id;
     $datosContacto = devolverContacto($id); 
     $datosUsuario = verificarUsuario();
+    $id_usuario = $datosUsuario['id'];
 
     if(!$datosContacto){
-        Flight::halt(404, 'El contacto solicitado no existe en la base de datos');
+        Flight::json(["No se encuentra el contacto en la base de datos"], 404);
+        Flight::stop();
+        exit();
     }
 
-    if($datosContacto['usuario_id'] != $datosUsuario['id']){
-        Flight::halt(403, 'Acceso a contacto no autorizado');
+    if($datosContacto['usuario_id'] != $id_usuario){
+        Flight::json(["No esta autorizado a acceder al contacto indicado"], 403);
+        Flight::stop();
+        exit();
     }
 
     $sentencia = Flight::db()->prepare("DELETE FROM contactos WHERE id = :id");
