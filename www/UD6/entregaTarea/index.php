@@ -8,7 +8,7 @@ $pass = $_ENV['DATABASE_PASSWORD'];
 
 Flight::register('db', 'PDO', array("mysql:host=$host;dbname=$name", $user, $pass));
 
-// Registrar usuarios
+// Ruta para registrar usuarios. Tambien podria crear el primer token del usuario, pero esa funcion se reserva para el login.
 Flight::route('POST /register', function(){
 
     $nombre = Flight::request()->data->nombre;
@@ -34,32 +34,19 @@ Flight::route('POST /register', function(){
 
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
 
-    $token = bin2hex(random_bytes(32));
-
-    $sql = "INSERT INTO usuarios(nombre, email, password, token) VALUES (:nombre, :email, :password, :token)";
+    $sql = "INSERT INTO usuarios(nombre, email, password) VALUES (:nombre, :email, :password)";
     $sentencia = Flight::db()->prepare($sql);
     
     $sentencia->bindParam(":nombre", $nombre);
     $sentencia->bindParam(":email", $email);
     $sentencia->bindParam(":password", $passwordHash);
-    $sentencia->bindParam(":token", $token);
 
     $sentencia->execute();
 
-    Flight::json(["Usuario $email registrado correctamente"]);
+    Flight::json(["Usuario $email registrado correctamente."]);
 });
 
-/*
-// Consultar usuarios
-Flight::route('GET /usuarios', function(){
-    $sentencia = Flight::db()->prepare("SELECT * FROM usuarios");
-    $sentencia->execute();
-    $datos = $sentencia->fetchAll();
-    Flight::json($datos);
-});
-*/
-
-// Iniciar sesion con un usuario. Crea un token único cada login asociado al usuario, actualiza la BD y lo devuelve en la cabecera de la peticion
+// Crea un token nuevo en cada login asociado al usuario que proporciona las credenciales y se lo devuelve en la cabecera de la respuesta.
 Flight::route('POST /login', function(){
 
     $email = Flight::request()->data->email;
@@ -134,7 +121,7 @@ function devolverContacto($id_contacto){
     return $datos;
 }
 
-// Añadir contactos si el token enviado por el usuario en la cabecera se encuentra en la base de datos, lo que acredita su autenticacion
+// Añadir contactos si el token enviado por el usuario en la cabecera se encuentra en la base de datos, lo que acredita su autenticacion.
 Flight::route('POST /contactos', function(){
 
     $datosUsuario = verificarUsuario();
@@ -143,6 +130,12 @@ Flight::route('POST /contactos', function(){
     $telefono = Flight::request()->data->telefono;
     $email = Flight::request()->data->email;
     $usuario_id = $datosUsuario['id'];
+
+    if(!$nombre || !$telefono || !$email){
+        Flight::json(["Incluye los campos nombre, telefono y email en la solicitud."], 400);
+        Flight::stop();
+        exit();
+    }
     
     $sql = "INSERT INTO contactos (nombre, telefono, email, usuario_id) VALUES (:nombre, :telefono, :email, :usuario_id)";
     $sentencia = Flight::db()->prepare($sql);
@@ -155,11 +148,12 @@ Flight::route('POST /contactos', function(){
     Flight::json(["Contacto registrado correctamente"]);
 });
 
-// Listar los contactos del usuario autenticado
+// Listar los contactos del usuario autenticado.
 Flight::route('GET /contactos(/@id)', function($id = null){
 
     $datosUsuario = verificarUsuario();
     $id_usuario = $datosUsuario['id'];
+    
     if($id){
         $datosContacto = devolverContacto($id);
 
@@ -186,16 +180,19 @@ Flight::route('GET /contactos(/@id)', function($id = null){
     }
 });
 
-// Actualizar los contactos del usuario autenticado
+// Actualiza los datos de un contacto. El campo id es necesario para identificar al contacto.
 Flight::route('PUT /contactos', function(){
     
     $datosUsuario = verificarUsuario();
     $id_usuario = $datosUsuario['id'];
 
     $id = Flight::request()->data->id;
-    $nombre = Flight::request()->data->nombre;
-    $telefono = Flight::request()->data->telefono;
-    $email = Flight::request()->data->email;
+
+    if(!$id){
+        Flight::json(["Para editar un contacto es necesario indicar en la peticion un id valido."], 400);
+        Flight::stop();
+        exit();
+    }
 
     $datosContacto = devolverContacto($id);
 
@@ -210,6 +207,10 @@ Flight::route('PUT /contactos', function(){
         Flight::stop();
         exit();
     }
+    // Si el usuario no actualiza los campos nombre, telefono y email se mantienen los valores originales.
+    $nombre = Flight::request()->data->nombre ?? $datosContacto['nombre'];
+    $telefono = Flight::request()->data->telefono ?? $datosContacto['telefono'];
+    $email = Flight::request()->data->email ?? $datosContacto['email'];
 
     $sql = "UPDATE contactos set nombre = :nombre, telefono = :telefono, email = :email WHERE id = :id";
     $sentencia = Flight::db()->prepare($sql);
@@ -223,6 +224,7 @@ Flight::route('PUT /contactos', function(){
 
 });
 
+// Borra un contacto a partir de id recibido en el body de la peticion.
 Flight::route('DELETE /contactos', function(){
     $id = Flight::request()->data->id;
     $datosContacto = devolverContacto($id); 
