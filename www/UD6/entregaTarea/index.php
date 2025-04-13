@@ -195,5 +195,26 @@ Flight::route('PUT /contactos', function(){
     Flight::json(["Informacion de contacto actualizada correctamente."]);
 
 });
+
+Flight::route('DELETE /contactos', function(){
+    $id = Flight::request()->data->id;
+    $datosContacto = devolverContacto($id); 
+    $datosUsuario = verificarUsuario();
+
+    if(!$datosContacto){
+        Flight::halt(404, 'El contacto solicitado no existe en la base de datos');
+    }
+
+    if($datosContacto['usuario_id'] != $datosUsuario['id']){
+        Flight::halt(403, 'Acceso a contacto no autorizado');
+    }
+
+    $sentencia = Flight::db()->prepare("DELETE FROM contactos WHERE id = :id");
+    $sentencia->bindParam(":id", $id);
+    $sentencia->execute();
+
+    Flight::json(["Contacto con id $id eliminado"]);
+});
+
 Flight::start();
 ?>
